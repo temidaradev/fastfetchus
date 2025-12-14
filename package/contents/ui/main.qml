@@ -351,7 +351,7 @@ PlasmoidItem {
             color: root.useSystemColors ? Kirigami.Theme.textColor : root.customForeground
             wrapMode: TextEdit.NoWrap
             textFormat: TextEdit.RichText
-            selectByMouse: true
+            selectByMouse: false
         }
     }
 
