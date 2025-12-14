@@ -11,9 +11,7 @@
         "Icon": "utilities-system-monitor",
         "Id": "com.temidaradev.fastfetchus",
         "Name": "fastfetchus",
-        "Version": "1",
-        "Website": "https://example.com/user/plasmoid-helloworldplugin",
-        "BugReportUrl": "https://example.com/user/plasmoid-helloworldplugin/bugs"
+        "Version": "1"
     },
     "X-Plasma-API-Minimum-Version": "6.0",
     "KPackageStructure": "Plasma/Applet"
