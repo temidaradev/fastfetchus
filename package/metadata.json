@@ -1,0 +1,20 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "temidaradev@proton.me",
+                "Name": "temidaradev"
+            }
+        ],
+        "Category": "fastfetchus",
+        "Description": "A widget to take over the world!",
+        "Icon": "utilities-system-monitor",
+        "Id": "com.temidaradev.fastfetchus",
+        "Name": "fastfetchus",
+        "Version": "1",
+        "Website": "https://example.com/user/plasmoid-helloworldplugin",
+        "BugReportUrl": "https://example.com/user/plasmoid-helloworldplugin/bugs"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "KPackageStructure": "Plasma/Applet"
+}
