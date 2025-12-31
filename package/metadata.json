@@ -7,7 +7,7 @@
             }
         ],
         "Category": "fastfetchus",
-        "Description": "A widget to take over the world!",
+        "Description": "view system information in your plasma desktop",
         "Icon": "utilities-system-monitor",
         "Id": "com.temidaradev.fastfetchus",
         "Name": "fastfetchus",

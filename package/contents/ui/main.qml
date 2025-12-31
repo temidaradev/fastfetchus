@@ -14,7 +14,13 @@ PlasmoidItem {
     preferredRepresentation: fullRepresentation
 
     property string fastfetchOutput: ""
+    property string pendingOutput: ""
+    property bool userHasSelection: false
+    readonly property string command: (Plasmoid.configuration.command || "fastfetch --pipe false")
     readonly property int refreshMs: (Plasmoid.configuration.refreshIntervalMs || 1000)
+    readonly property int refreshMsClamped: Math.max(250, root.refreshMs)
+    readonly property bool refreshWhenCollapsed: (Plasmoid.configuration.refreshWhenCollapsed === true)
+    readonly property bool allowSelection: (Plasmoid.configuration.allowSelection !== false)
     readonly property int fontPx: (Plasmoid.configuration.fontPixelSize || 10)
     readonly property bool useSystemColors: (Plasmoid.configuration.useSystemColors !== false)
     readonly property bool transparentBackground: (Plasmoid.configuration.transparentBackground === true)
@@ -24,6 +30,7 @@ PlasmoidItem {
     readonly property color customBackground: Plasmoid.configuration.backgroundColor || Kirigami.Theme.backgroundColor
 
     readonly property real bgAlpha: root.transparentBackground ? 0.0 : Math.max(0.0, Math.min(1.0, root.backgroundOpacity))
+    readonly property bool shouldRefresh: root.visible && (root.expanded || root.refreshWhenCollapsed)
 
     function ansi16ToHex(idx) {
         var palette = [
@@ -57,10 +64,29 @@ PlasmoidItem {
     }
 
     function escapeHtml(s) {
+        s = String(s)
         return s.replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
                 .replace(/\"/g, "&quot;")
+    }
+
+    function renderMessageToRichText(message, color) {
+        if (!message)
+            return ""
+        var style = ""
+        if (color)
+            style = " style=\"color:" + color + ";\""
+        return "<pre><span" + style + ">" + escapeHtml(message) + "</span></pre>"
+    }
+
+    function setRenderedOutput(rendered) {
+        if (root.allowSelection && root.userHasSelection) {
+            root.pendingOutput = rendered
+            return
+        }
+        root.fastfetchOutput = rendered
+        root.pendingOutput = ""
     }
 
     function renderAnsiToRichText(input) {
@@ -299,32 +325,61 @@ PlasmoidItem {
         id: executable
         engine: "executable"
         connectedSources: []
+        property bool execInFlight: false
         
         onNewData: function(sourceName, data) {
-            var stdout = data["stdout"]
+            var stdout = data["stdout"] || ""
+            var stderr = data["stderr"] || ""
+            var exitCodeRaw = data["exit code"]
+            if (exitCodeRaw === undefined)
+                exitCodeRaw = data["exitCode"]
+            var exitCode = parseInt(exitCodeRaw)
+            if (isNaN(exitCode))
+                exitCode = 0
+
             if (stdout) {
-                root.fastfetchOutput = renderAnsiToRichText(stdout)
+                root.setRenderedOutput(renderAnsiToRichText(stdout))
+            } else if (stderr || exitCode) {
+                var msg = stderr || ("Command failed (exit " + exitCode + ")")
+                root.setRenderedOutput(renderMessageToRichText(msg, Kirigami.Theme.negativeTextColor))
+            } else {
+                root.setRenderedOutput(renderMessageToRichText("No output.", Kirigami.Theme.textColor))
             }
+
+            executable.execInFlight = false
             disconnectSource(sourceName)
         }
         
         function exec(cmd) {
+            if (!cmd || executable.execInFlight)
+                return
+            executable.execInFlight = true
             connectSource(cmd)
         }
     }
 
-    // Auto-refresh timer
     Timer {
-        interval: root.refreshMs
-        running: true
+        interval: root.refreshMsClamped
+        running: root.shouldRefresh
         repeat: true
         onTriggered: {
-            executable.exec("zsh -lc 'fastfetch --pipe false'")
+            executable.exec(root.command)
         }
     }
 
     Component.onCompleted: {
-        executable.exec("zsh -lc 'fastfetch --pipe false'")
+        if (root.shouldRefresh)
+            executable.exec(root.command)
+    }
+
+    onShouldRefreshChanged: {
+        if (root.shouldRefresh)
+            executable.exec(root.command)
+    }
+
+    onCommandChanged: {
+        if (root.shouldRefresh)
+            executable.exec(root.command)
     }
 
     fullRepresentation: Item {
@@ -351,7 +406,22 @@ PlasmoidItem {
             color: root.useSystemColors ? Kirigami.Theme.textColor : root.customForeground
             wrapMode: TextEdit.NoWrap
             textFormat: TextEdit.RichText
-            selectByMouse: false
+            selectByMouse: root.allowSelection
+            focus: root.allowSelection
+
+            function syncSelectionState() {
+                var hasSelectionNow = (outputText.selectionStart !== outputText.selectionEnd)
+                if (root.userHasSelection === hasSelectionNow)
+                    return
+                root.userHasSelection = hasSelectionNow
+                if (!root.userHasSelection && root.pendingOutput) {
+                    root.fastfetchOutput = root.pendingOutput
+                    root.pendingOutput = ""
+                }
+            }
+
+            onSelectionStartChanged: syncSelectionState()
+            onSelectionEndChanged: syncSelectionState()
         }
     }
 

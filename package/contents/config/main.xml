@@ -6,6 +6,18 @@
 	<kcfgfile name="" />
 
 	<group name="General">
+		<entry name="command" type="String">
+			<default>fastfetch --pipe false</default>
+		</entry>
+
+		<entry name="refreshWhenCollapsed" type="Bool">
+			<default>false</default>
+		</entry>
+
+		<entry name="allowSelection" type="Bool">
+			<default>true</default>
+		</entry>
+
 		<entry name="useSystemColors" type="Bool">
 			<default>true</default>
 		</entry>

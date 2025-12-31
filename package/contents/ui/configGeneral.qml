@@ -13,6 +13,27 @@ Kirigami.FormLayout {
 	property alias cfg_backgroundOpacity: backgroundOpacity.value
 	property alias cfg_fontPixelSize: fontSize.value
 	property alias cfg_refreshIntervalMs: refreshInterval.value
+	property alias cfg_command: commandField.text
+	property alias cfg_refreshWhenCollapsed: refreshWhenCollapsed.checked
+	property alias cfg_allowSelection: allowSelection.checked
+
+	PlasmaComponents.TextField {
+		id: commandField
+		Kirigami.FormData.label: "Command:"
+		placeholderText: "fastfetch --pipe false"
+	}
+
+	PlasmaComponents.CheckBox {
+		id: refreshWhenCollapsed
+		text: "Refresh when collapsed"
+		Kirigami.FormData.label: "Refresh:"
+	}
+
+	PlasmaComponents.CheckBox {
+		id: allowSelection
+		text: "Allow selecting/copying output"
+		Kirigami.FormData.label: "Output:"
+	}
 
 	PlasmaComponents.CheckBox {
 		id: useSystemColors
@@ -64,4 +85,3 @@ Kirigami.FormLayout {
 		stepSize: 250
 	}
 }
-

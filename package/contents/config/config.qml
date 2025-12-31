@@ -5,7 +5,6 @@ PlasmaConfig.ConfigModel {
 	PlasmaConfig.ConfigCategory {
 		name: "General"
 		icon: "configure"
-		source: "../ui/configGeneral.qml"
+		source: "configGeneral.qml"
 	}
 }
-
