@@ -10,6 +10,32 @@ You can directly install this widget from plasma get new widgets app and use it 
 
 <img width="1161" height="533" alt="image" src="https://github.com/user-attachments/assets/6d2a72a8-d7b0-407f-ae15-cf65023a58d9" />
 
+### Manual Installation from Source
+
+If you prefer to install from source or the widget is not available in the Plasma store:
+
+1. Ensure you have KDE Plasma 6 and the necessary development tools installed. You may need `kpackagetool6` (part of plasma-framework).
+
+2. Clone or download this repository.
+
+3. Navigate to the project directory.
+
+4. Install the plasmoid package:
+
+   ```
+   kpackagetool6 --install package/ --type Plasma/Applet
+   ```
+
+5. Restart Plasma or log out and back in to see the new widget in the widget list.
+
+To uninstall:
+
+```
+kpackagetool6 --remove fastfetchus
+```
+
+Note: This project is written in QML and does not require compilation. The installation process packages the QML files into a plasmoid.
+
 ## How fastfetch output is rendered
 
 `fastfetch` does not only print plain text:
