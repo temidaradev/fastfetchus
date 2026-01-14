@@ -2,6 +2,14 @@
 
 A KDE Plasma (Plasma 6) widget that renders `fastfetch` output inside QML.
 
+## Installation
+
+You can directly install this widget from plasma get new widgets app and use it directly like this
+
+<img width="793" height="563" alt="image" src="https://github.com/user-attachments/assets/1a97c86b-ca8b-4f3f-bdcf-afee89f222ec" />
+
+<img width="1161" height="533" alt="image" src="https://github.com/user-attachments/assets/6d2a72a8-d7b0-407f-ae15-cf65023a58d9" />
+
 ## How fastfetch output is rendered
 
 `fastfetch` does not only print plain text:
