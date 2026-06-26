@@ -31,7 +31,7 @@ If you prefer to install from source or the widget is not available in the Plasm
 To uninstall:
 
 ```
-kpackagetool6 --remove fastfetchus
+kpackagetool6 --remove com.temidaradev.fastfetchus
 ```
 
 Note: This project is written in QML and does not require compilation. The installation process packages the QML files into a plasmoid.
@@ -92,11 +92,19 @@ Other handling:
 
 ## Configuration
 
-The widget exposes settings via KConfigXT:
+The widget exposes settings via KConfigXT, grouped into **General** and **Appearance**:
 
+General:
+
+- Command to run (default `fastfetch --pipe false`)
 - Refresh interval (ms)
 - Font size (px)
-- Use system colors or custom fg/bg colors
+- Keep refreshing while collapsed
+- Allow selecting and copying output
+
+Appearance:
+
+- Use system theme colors, or pick custom foreground/background colors
 - Transparent background toggle
 - Background opacity
 

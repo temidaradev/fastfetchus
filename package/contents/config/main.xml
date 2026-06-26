@@ -22,11 +22,11 @@
 			<default>true</default>
 		</entry>
 
-		<entry name="foregroundColor" type="String">
+		<entry name="foregroundColor" type="Color">
 			<default>#E6E6E6</default>
 		</entry>
 
-		<entry name="backgroundColor" type="String">
+		<entry name="backgroundColor" type="Color">
 			<default>#1E1E1E</default>
 		</entry>
 
