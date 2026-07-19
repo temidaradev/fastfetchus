@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import org.kde.plasma.plasmoid
 import org.kde.plasma.plasma5support as Plasma5Support
+import org.kde.plasma.core as PlasmaCore
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.components as PlasmaComponents
 
@@ -30,7 +31,15 @@ PlasmoidItem {
     readonly property color customBackground: Plasmoid.configuration.backgroundColor || Kirigami.Theme.backgroundColor
 
     readonly property real bgAlpha: root.transparentBackground ? 0.0 : Math.max(0.0, Math.min(1.0, root.backgroundOpacity))
-    readonly property bool shouldRefresh: root.visible && (root.expanded || root.refreshWhenCollapsed)
+
+    // On the desktop (not inside a panel) the full representation is shown
+    // inline and `expanded` stays false, so gating refresh on `expanded` would
+    // leave the widget permanently blank. Only a panel-hosted widget is truly
+    // "collapsed" when its popup is closed.
+    readonly property bool inPanel: Plasmoid.formFactor === PlasmaCore.Types.Horizontal
+                                    || Plasmoid.formFactor === PlasmaCore.Types.Vertical
+    readonly property bool shouldRefresh: root.visible
+                                          && (!root.inPanel || root.expanded || root.refreshWhenCollapsed)
 
     function ansi16ToHex(idx) {
         var palette = [
@@ -328,6 +337,7 @@ PlasmoidItem {
         property bool execInFlight: false
         
         onNewData: function(sourceName, data) {
+            watchdog.stop()
             var stdout = data["stdout"] || ""
             var stderr = data["stderr"] || ""
             var exitCodeRaw = data["exit code"]
@@ -354,7 +364,28 @@ PlasmoidItem {
             if (!cmd || executable.execInFlight)
                 return
             executable.execInFlight = true
+            watchdog.restart()
             connectSource(cmd)
+        }
+    }
+
+    // Safety net: if the executable engine never delivers data (missing engine
+    // plugin, a command that hangs, etc.) clear the in-flight latch and surface
+    // an error instead of leaving the widget blank forever.
+    Timer {
+        id: watchdog
+        interval: Math.max(5000, root.refreshMsClamped * 3)
+        repeat: false
+        onTriggered: {
+            if (!executable.execInFlight)
+                return
+            executable.execInFlight = false
+            if (!root.fastfetchOutput) {
+                root.setRenderedOutput(renderMessageToRichText(
+                    "No response from \"" + root.command + "\".\n" +
+                    "Check that the command exists and the Plasma executable engine is installed.",
+                    Kirigami.Theme.negativeTextColor))
+            }
         }
     }
 
